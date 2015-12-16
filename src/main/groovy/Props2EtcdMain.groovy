@@ -22,7 +22,6 @@ class Props2EtcdMain {
     }
 
     static void props2Etcd(String propertiesFile, String etcdEndpoint) {
-        println "I want to be a little fishy, yes I do yes I do yes I do"
         println "propertiesFile = $propertiesFile"
         println "etcdEndpoint = $etcdEndpoint"
 

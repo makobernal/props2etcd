@@ -5,7 +5,6 @@ class Props2EtcdMain {
     Props2EtcdMain(){
         cliBuilder = new CliBuilder(usage: 'props2etcd -[h] <props-file> <etcd-endpoint>')
         cliBuilder.propsfile(args: 1, '.properties or .yml file to parse and load into Etcd')
-        cliBuilder.propsfile(args: 1, '.properties or .yml file to parse and load into Etcd')
         cliBuilder.etcdEndpoint(args: 2, 'Etcd endpoint to work with (optional, default: http://localhost:1234)')
         cliBuilder.h('Print this message')
     }
@@ -26,5 +25,18 @@ class Props2EtcdMain {
         println "I want to be a little fishy, yes I do yes I do yes I do"
         println "propertiesFile = $propertiesFile"
         println "etcdEndpoint = $etcdEndpoint"
+
+        String userDir = System.getProperty('user.dir')
+
+        File file = new File("$userDir/$propertiesFile")
+        println file.absolutePath
+
+        // check file exists
+        // slurp as Properties object
+        // delete existing content in etcd if option is true
+        // feed to etcd
+        // check we were succesful
+
+
     }
 }

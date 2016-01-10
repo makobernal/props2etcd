@@ -12,7 +12,11 @@ class Props2EtcdService {
 		}
 	}
 
-	def deleteRoot(String root) {
-		etcd.deleteDir(root).recursive().send()
+	void deleteRoot(String root) {
+		etcd.deleteDir(root).recursive().send().get()
+	}
+
+	void putProperties(Properties props) {
+		props
 	}
 }

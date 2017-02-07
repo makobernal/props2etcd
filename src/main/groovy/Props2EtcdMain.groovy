@@ -1,41 +1,51 @@
+import exception.UnsupportedFileTypeException
+import mousio.etcd4j.responses.EtcdException
+
 class Props2EtcdMain {
 
-    CliBuilder cliBuilder
-
-    Props2EtcdMain(){
-        cliBuilder = new CliBuilder(usage: 'props2etcd -[h] <props-file> <etcd-endpoint>')
-        cliBuilder.propsfile(args: 1, '.properties or .yml file to parse and load into Etcd')
-        cliBuilder.etcdEndpoint(args: 2, 'Etcd endpoint to work with (optional, default: http://localhost:1234)')
-        cliBuilder.h('Print this message')
+    static void main(String[] args){
+        new Props2EtcdRunner(args).run()
     }
 
-    static void main(args) {
-        def cli = new Props2EtcdMain().cliBuilder
-        def options = cli.parse(args)
+}
 
-        if (options.h) {
-            println cli.usage()
+class Props2EtcdRunner {
+
+    private OptionAccessor options
+    CliBuilder cliBuilder
+    Props2EtcdCore props2Etcd = new Props2EtcdCore()
+
+    Props2EtcdRunner(String[] args) {
+        cliBuilder = new CliBuilder(usage: 'props2etcd [options]', width: 120)
+        cliBuilder.with {
+            d longOpt:'dir', args:1, argName:'directory', required: true, 'REQUIRED. Directory in etcd where the properties will be loaded'
+            e longOpt:'endpoint', args:1, argName: 'endpoint', 'Location of etcd cluster (default: http://localhost:2379)'
+            f longOpt:'file', args:1, argName:'file', required: true, 'REQUIRED. Path to .properties or .yml file containing the properties'
+            h longOpt:'help', 'Print this message'
+            r longOpt:'force-remove', 'If used then the original contents of the directory in etcd will be removed'
+        }
+        options = cliBuilder.parse(args)
+    }
+
+    void run() {
+
+        if (!options){
             return
-        } else {
-            Props2EtcdMain.props2Etcd(options.arguments()[0], options.arguments()[1])
+        }
+
+        if (options.h || !options.arguments().isEmpty()){
+            cliBuilder.usage()
+            return
+        }
+        try {
+            props2Etcd.doIt(options.d, options.f, options.e, options.r)
+
+        } catch (FileNotFoundException | IllegalArgumentException | UnsupportedFileTypeException e) {
+            println e.getMessage()
+        } catch (EtcdException e) {
+            println "Etcd error code ${e.getMessage()}"
         }
     }
 
-    static void props2Etcd(String propertiesFile, String etcdEndpoint) {
-        println "propertiesFile = $propertiesFile"
-        println "etcdEndpoint = $etcdEndpoint"
-
-        String userDir = System.getProperty('user.dir')
-
-        File file = new File("$userDir/$propertiesFile")
-        println file.absolutePath
-
-        // check file exists
-        // slurp as Properties object
-        // delete existing content in etcd if option is true
-        // feed to etcd
-        // check we were succesful
-
-
-    }
 }
+

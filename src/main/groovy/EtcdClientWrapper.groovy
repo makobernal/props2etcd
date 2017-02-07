@@ -25,7 +25,7 @@ class EtcdClientWrapper {
         }
     }
 
-    private def getFromNode(EtcdNode node){
+    private getFromNode(EtcdNode node){
         if (node.dir) {
             return [(node.key): getFromNode(node.nodes)]
         } else {
